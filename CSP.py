@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class CSP:
     def __init__(self, variables, domains, constraints):
         self.variables = variables
@@ -28,10 +29,13 @@ class CSP:
         revised = False
         var_i, var_j = constraint
         for value_i in list(self.domains[var_i]):
-            if all(not self.is_consistent(var_i, value_i, {var_j: value_j}) for value_j in self.domains[var_j]):
+            if all(
+                not self.is_consistent(var_i, value_i, {var_j: value_j})
+                for value_j in self.domains[var_j]
+            ):
                 self.domains[var_i].remove(value_i)
                 revised = True
-        return revised        
+        return revised
 
     def get_neighbors(self, variable):
         neighbors = []
@@ -65,4 +69,3 @@ class CSP:
         if not self.arc_consistency():
             return None  # No solution possible due to inconsistency
         return self.backtracking_search()
-
