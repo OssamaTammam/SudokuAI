@@ -224,8 +224,29 @@ class GUI:
                         self.fill_grid(
                             self.selected_row, self.selected_col, int(event.unicode)
                         )
-                elif event.key == pygame.K_r and self.mode == 3 and not self.solved:
+                elif (
+                    (
+                        event.key
+                        in [
+                            pygame.K_0,
+                            pygame.K_1,
+                            pygame.K_2,
+                            pygame.K_3,
+                            pygame.K_4,
+                            pygame.K_5,
+                            pygame.K_6,
+                            pygame.K_7,
+                            pygame.K_8,
+                            pygame.K_9,
+                        ]
+                    )
+                    and self.mode == 3
+                    and not self.solved
+                ):
                     if self.selected_row is not None and self.selected_col is not None:
+                        self.fill_grid(
+                            self.selected_row, self.selected_col, int(event.unicode)
+                        )
                         if self.check_validity(self.selected_row, self.selected_col):
                             print("Entry is valid!")
                         else:
