@@ -76,3 +76,10 @@ class CSP:
         if not self.arc_consistency():
             return None  # No solution possible due to inconsistency
         return self.backtracking_search()
+
+    def print_arc_trees(self):
+        print("Arc Trees:")
+        for var_i, neighbor_dict in self.arc_trees.items():
+            print(f"Variable {var_i}:")
+            for var_j, revised_domain in neighbor_dict.items():
+                print(f"  Neighbor variable {var_j}: Revised domain = {revised_domain}")

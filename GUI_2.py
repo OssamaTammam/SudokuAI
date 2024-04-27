@@ -145,7 +145,7 @@ class GUI:
         else:
             self.board_unsolvable = True
 
-        csp.print_arctrees()
+        csp.print_arc_trees()
 
     def fill_grid(self, row, col, value):
         if 0 <= row < 9 and 0 <= col < 9 and 0 <= value <= 9:
