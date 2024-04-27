@@ -8,8 +8,10 @@ class CSP:
         self.constraints = constraints
 
     def is_consistent(self, variable, value, assignment):
-        for constraint in self.constraints:
-            if not constraint(variable, value, assignment):
+        for var_i, var_j in self.constraints:
+            if var_i == variable and (var_j, value) in assignment.items():
+                return False
+            if var_j == variable and (var_i, value) in assignment.items():
                 return False
         return True
 

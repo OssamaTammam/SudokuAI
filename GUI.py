@@ -16,8 +16,22 @@ class GUI:
         self.GRAY = (128, 128, 128)
         self.font = pygame.font.Font(None, 40)
         self.cell_size = self.WIDTH // 9
+        self.mode = 1
 
-        self.grid = np.zeros((9, 9), dtype=int)
+        # self.grid = np.zeros((9, 9), dtype=int)
+        self.grid = np.array(
+            [
+                [5, 3, 0, 0, 7, 0, 0, 0, 0],
+                [6, 0, 0, 1, 9, 5, 0, 0, 0],
+                [0, 9, 8, 0, 0, 0, 0, 6, 0],
+                [8, 0, 0, 0, 6, 0, 0, 0, 3],
+                [4, 0, 0, 8, 0, 3, 0, 0, 1],
+                [7, 0, 0, 0, 2, 0, 0, 0, 6],
+                [0, 6, 0, 0, 0, 0, 2, 8, 0],
+                [0, 0, 0, 4, 1, 9, 0, 0, 5],
+                [0, 0, 0, 0, 8, 0, 0, 7, 9],
+            ]
+        )
 
     def draw_grid(self):
         for i in range(10):
@@ -54,18 +68,20 @@ class GUI:
     def solve_sudoku(self):
         csp = CSP(
             variables=[(i, j) for i in range(9) for j in range(9)],
-            domains={(i.j): list(range(1, 10)) for i in range(9) for j in range(9)},
+            domains={(i, j): list(range(1, 10)) for i in range(9) for j in range(9)},
             constraints=[
-                (var_i, var_j)
-                for var_i in range(9)
-                for var_j in range(9)
-                if var_i != var_j
+                ((var_i_row, var_i_col), (var_j_row, var_j_col))
+                for var_i_row in range(9)
+                for var_i_col in range(9)
+                for var_j_row in range(9)
+                for var_j_col in range(9)
+                if (var_i_row != var_j_row or var_i_col != var_j_col)
                 and (
-                    var_i[0] == var_j[0]
-                    or var_i[1] == var_j[1]
+                    var_i_row == var_j_row
+                    or var_i_col == var_j_col
                     or (
-                        var_i[0] // 3 == var_j[0] // 3
-                        and var_i[1] // 3 == var_j[1] // 3
+                        var_i_row // 3 == var_j_row // 3
+                        and var_i_col // 3 == var_j_col // 3
                     )
                 )
             ],
