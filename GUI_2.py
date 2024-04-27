@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 from CSP import CSP
+import time
 
 
 class GUI:
@@ -137,7 +138,10 @@ class GUI:
                 if self.grid[i][j] != 0:
                     csp.domains[(i, j)] = [self.grid[i][j]]
 
+        start_time = time.time()
         solution = csp.solve()
+        end_time = time.time()
+
         if solution:
             for i in range(9):
                 for j in range(9):
@@ -146,6 +150,7 @@ class GUI:
             self.board_unsolvable = True
 
         csp.print_arc_trees()
+        print("Time Took: ", (end_time - start_time))
 
     def fill_grid(self, row, col, value):
         if 0 <= row < 9 and 0 <= col < 9 and 0 <= value <= 9:
