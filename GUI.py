@@ -1,32 +1,27 @@
-import pygame  # Importing Pygame library for building GUI applications
-import numpy as np  # Importing NumPy library for numerical operations
-from CSP import (
-    CSP,
-)  # Importing the CSP module for solving Constraint Satisfaction Problems
-import time  # Importing time module for time-related functions
+import pygame
+import numpy as np
+from CSP import CSP
+import time
 
 
 class GUI:
     def __init__(self):
-        pygame.init()  # Initializing Pygame
-        self.WIDTH = 500  # Setting the width of the window
-        self.HEIGHT = 500  # Setting the height of the window
-        self.screen = pygame.display.set_mode(
-            (self.WIDTH, self.HEIGHT + 100)
-        )  # Creating the Pygame display window
-        pygame.display.set_caption("Sudoku Solver")  # Setting the title of the window
-        self.WHITE = (255, 255, 255)  # Defining colors
+        pygame.init()
+        self.WIDTH = 500
+        self.HEIGHT = 500
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT + 200))
+        pygame.display.set_caption("Sudoku Solver")
+        self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.GRAY = (128, 128, 128)
-        self.font = pygame.font.Font(None, 40)  # Defining font for text rendering
-        self.cell_size = self.WIDTH // 9  # Calculating cell size for Sudoku grid
-        self.mode = 1  # Initializing mode (1 or 2)
-        self.selected_row = None  # Initializing selected row and column
+        self.font = pygame.font.Font(None, 40)
+        self.cell_size = self.WIDTH // 9
+        self.mode = 1
+        self.selected_row = None
         self.selected_col = None
-        self.solved = False  # Flag to indicate if Sudoku puzzle is solved
-        self.board_unsolvable = False  # Flag to indicate if the board is unsolvable
+        self.solved = False
+        self.board_unsolvable = False
 
-        # Initial Sudoku puzzle grid
         self.grid = np.array(
             [
                 [5, 3, 0, 0, 7, 0, 0, 0, 0],
@@ -44,7 +39,6 @@ class GUI:
         # Add mode buttons
         button_width = 100
         button_height = 30
-        # Define mode buttons' rectangles
         self.mode1_button = pygame.Rect(
             (self.WIDTH - button_width) // 2,
             self.HEIGHT + 10,
@@ -57,12 +51,19 @@ class GUI:
             button_width,
             button_height,
         )
-        self.mode_buttons_color = self.GRAY  # Color for mode buttons
-        self.mode_buttons_text_color = self.BLACK  # Text color for mode buttons
-        self.mode_buttons_font = pygame.font.Font(None, 24)  # Font for mode buttons
+
+        self.mode3_button = pygame.Rect(
+            (self.WIDTH - button_width) // 2,
+            self.HEIGHT + 90,
+            button_width,
+            button_height,
+        )
+
+        self.mode_buttons_color = self.GRAY
+        self.mode_buttons_text_color = self.BLACK
+        self.mode_buttons_font = pygame.font.Font(None, 24)
 
     def draw_mode_buttons(self):
-        # Draw mode buttons
         # Mode 1 button
         pygame.draw.rect(self.screen, self.mode_buttons_color, self.mode1_button)
         mode1_text = self.mode_buttons_font.render(
@@ -79,19 +80,30 @@ class GUI:
         mode2_text_rect = mode2_text.get_rect(center=self.mode2_button.center)
         self.screen.blit(mode2_text, mode2_text_rect)
 
+        pygame.draw.rect(self.screen, self.mode_buttons_color, self.mode3_button)
+        mode3_text = self.mode_buttons_font.render(
+            "Mode 3", True, self.mode_buttons_text_color
+        )
+        mode3_text_rect = mode3_text.get_rect(center=self.mode3_button.center)
+        self.screen.blit(mode3_text, mode3_text_rect)
+
     def handle_mode_buttons_click(self, pos):
-        # Handle mode buttons click event
         if self.mode1_button.collidepoint(pos):
+            self.solved = False
             self.mode = 1
             print("Mode 1 selected")
-        elif self.mode2_button.collidepoint(pos) and self.mode == 1:
+        elif self.mode2_button.collidepoint(pos):
             self.solved = False
             self.mode = 2
             self.grid = np.zeros((9, 9), dtype=int)
             print("Mode 2 selected")
+        elif self.mode3_button.collidepoint(pos):
+            self.solved = False
+            self.mode = 3
+            self.grid = np.zeros((9, 9), dtype=int)
+            print("Mode 3 selected")
 
     def draw_grid(self):
-        # Draw Sudoku grid
         for i in range(10):
             if i % 3 == 0:
                 thickness = 5
@@ -113,7 +125,6 @@ class GUI:
             )
 
     def draw_number(self):
-        # Draw numbers on Sudoku grid
         for i in range(9):
             for j in range(9):
                 if self.grid[i][j] != 0:
@@ -123,7 +134,6 @@ class GUI:
                     )
 
     def solve_sudoku(self):
-        # Solve Sudoku puzzle using CSP solver
         csp = CSP(
             variables=[(i, j) for i in range(9) for j in range(9)],
             domains={(i, j): list(range(1, 10)) for i in range(9) for j in range(9)},
@@ -161,25 +171,42 @@ class GUI:
         else:
             self.board_unsolvable = True
 
-        csp.print_arc_trees()  # Print arc trees for debugging
-        print("Time Took: ", (end_time - start_time), " Seconds")
+        csp.print_arc_trees()
+        print("Run Time: ", end_time - start_time, " Seconds")
 
     def fill_grid(self, row, col, value):
-        # Fill Sudoku grid with a number
         if 0 <= row < 9 and 0 <= col < 9 and 0 <= value <= 9:
             self.grid[row][col] = value
 
+    def check_validity(self, row, col):
+        for x in range(9):
+            if self.grid[row][col] == self.grid[row][x] and x != col:
+                self.grid[row][col] = 0
+                return False
+            if self.grid[row][col] == self.grid[x][col] and x != row:
+                self.grid[row][col] = 0
+                return False
+            box_x = col // 3
+            box_y = row // 3
+            for m in range(box_y * 3, box_y * 3 + 3):
+                for n in range(box_x * 3, box_x * 3 + 3):
+                    if self.grid[row][col] == self.grid[m][n] and (m, n) != (row, col):
+                        self.grid[row][col] = 0
+                        return False
+        return True
+
     def handle_events(self):
-        # Handle Pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.mode1_button.collidepoint(
-                    mouse_pos
-                ) or self.mode2_button.collidepoint(mouse_pos):
+                if (
+                    self.mode1_button.collidepoint(mouse_pos)
+                    or self.mode2_button.collidepoint(mouse_pos)
+                    or self.mode3_button.collidepoint(mouse_pos)
+                ):
                     self.handle_mode_buttons_click(mouse_pos)
                 else:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -210,25 +237,51 @@ class GUI:
                         self.fill_grid(
                             self.selected_row, self.selected_col, int(event.unicode)
                         )
+                elif (
+                    (
+                        event.key
+                        in [
+                            pygame.K_0,
+                            pygame.K_1,
+                            pygame.K_2,
+                            pygame.K_3,
+                            pygame.K_4,
+                            pygame.K_5,
+                            pygame.K_6,
+                            pygame.K_7,
+                            pygame.K_8,
+                            pygame.K_9,
+                        ]
+                    )
+                    and self.mode == 3
+                    and not self.solved
+                ):
+                    if self.selected_row is not None and self.selected_col is not None:
+                        self.fill_grid(
+                            self.selected_row, self.selected_col, int(event.unicode)
+                        )
+                        if self.check_validity(self.selected_row, self.selected_col):
+                            print("Entry is valid!")
+                        else:
+                            print("Entry violates Sudoku rules!")
         pygame.display.flip()
 
     def main(self):
-        # Main loop of the GUI
         clock = pygame.time.Clock()
         running = True
         while running:
-            self.screen.fill(self.WHITE)  # Fill the screen with white color
-            self.draw_grid()  # Draw Sudoku grid
-            self.draw_number()  # Draw numbers on the grid
-            self.draw_mode_buttons()  # Draw mode buttons
+            self.screen.fill(self.WHITE)
+            self.draw_grid()
+            self.draw_number()
+            self.draw_mode_buttons()
             if self.board_unsolvable:
                 text = self.font.render("Board can't be solved", True, self.BLACK)
                 text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT + 80))
                 self.screen.blit(text, text_rect)
-            self.handle_events()  # Handle Pygame events
-            clock.tick(30)  # Cap the frame rate at 30 FPS
+            self.handle_events()
+            clock.tick(30)
 
 
 if __name__ == "__main__":
-    gui = GUI()  # Create an instance of the GUI class
-    gui.main()  # Call the main method to start the GUI application
+    gui = GUI()
+    gui.main()
