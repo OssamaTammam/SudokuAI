@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 from CSP import CSP
+import time
 
 
 class GUI:
@@ -88,13 +89,16 @@ class GUI:
 
     def handle_mode_buttons_click(self, pos):
         if self.mode1_button.collidepoint(pos):
+            self.solved = False
             self.mode = 1
             print("Mode 1 selected")
         elif self.mode2_button.collidepoint(pos):
+            self.solved = False
             self.mode = 2
             self.grid = np.zeros((9, 9), dtype=int)
             print("Mode 2 selected")
         elif self.mode3_button.collidepoint(pos):
+            self.solved = False
             self.mode = 3
             self.grid = np.zeros((9, 9), dtype=int)
             print("Mode 3 selected")
@@ -156,13 +160,19 @@ class GUI:
                 if self.grid[i][j] != 0:
                     csp.domains[(i, j)] = [self.grid[i][j]]
 
+        start_time = time.time()
         solution = csp.solve()
+        end_time = time.time()
+
         if solution:
             for i in range(9):
                 for j in range(9):
                     self.grid[i][j] = solution[(i, j)]
         else:
             self.board_unsolvable = True
+
+        csp.print_arc_trees()
+        print("Run Time: ", end_time - start_time, " Seconds")
 
     def fill_grid(self, row, col, value):
         if 0 <= row < 9 and 0 <= col < 9 and 0 <= value <= 9:
