@@ -171,14 +171,17 @@ class GUI:
     def check_validity(self, row, col):
         for x in range(9):
             if self.grid[row][col] == self.grid[row][x] and x != col:
+                self.grid[row][col] = 0
                 return False
             if self.grid[row][col] == self.grid[x][col] and x != row:
+                self.grid[row][col] = 0
                 return False
             box_x = col // 3
             box_y = row // 3
             for m in range(box_y * 3, box_y * 3 + 3):
                 for n in range(box_x * 3, box_x * 3 + 3):
                     if self.grid[row][col] == self.grid[m][n] and (m, n) != (row, col):
+                        self.grid[row][col] = 0
                         return False
         return True
 
