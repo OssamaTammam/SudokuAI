@@ -1,4 +1,4 @@
-from collections import deque
+from collections import defaultdict, deque
 
 
 class CSP:
@@ -6,6 +6,7 @@ class CSP:
         self.variables = variables
         self.domains = domains
         self.constraints = constraints
+        self.arc_trees = defaultdict(dict)  # Store revised values for each variable
 
     def is_consistent(self, variable, value, assignment):
         for var_i, var_j in self.constraints:
@@ -37,6 +38,10 @@ class CSP:
             ):
                 self.domains[var_i].remove(value_i)
                 revised = True
+        if revised:
+            self.arc_trees[var_i][var_j] = list(
+                self.domains[var_i]
+            )  # Save revised values
         return revised
 
     def get_neighbors(self, variable):
