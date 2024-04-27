@@ -77,6 +77,7 @@ class GUI:
             print("Mode 1 selected")
         elif self.mode2_button.collidepoint(pos):
             self.mode = 2
+            self.grid = np.zeros((9, 9), dtype=int)
             print("Mode 2 selected")
 
     def draw_grid(self):
