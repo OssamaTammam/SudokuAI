@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 from CSP import CSP
 import time
+from Generator import SudokuGenerator
 
 
 class GUI:
@@ -59,9 +60,36 @@ class GUI:
             button_height,
         )
 
+        self.generate_button = pygame.Rect(
+            (self.WIDTH - button_width) // 2,
+            self.HEIGHT + 130,
+            button_width,
+            button_height,
+        )  # Button for generating a new puzzle
+
         self.mode_buttons_color = self.GRAY
         self.mode_buttons_text_color = self.BLACK
         self.mode_buttons_font = pygame.font.Font(None, 24)
+
+        self.generator = SudokuGenerator()  # Initialize SudokuGenerator
+
+    def draw_generate_button(self):
+        # Draw generate button
+        pygame.draw.rect(self.screen, self.GRAY, self.generate_button)
+        generate_text = self.mode_buttons_font.render(
+            "Generate Puzzle", True, self.BLACK
+        )
+        generate_text_rect = generate_text.get_rect(center=self.generate_button.center)
+        self.screen.blit(generate_text, generate_text_rect)
+
+    def handle_generate_button_click(self, pos):
+        # Handle generate button click
+        if self.generate_button.collidepoint(pos):
+            self.generate_new_puzzle()  # Call method to generate new puzzle
+
+    def generate_new_puzzle(self):
+        self.grid = self.generator.generate_puzzle()  # Generate new puzzle
+        print(self.grid)
 
     def draw_mode_buttons(self):
         # Mode 1 button
@@ -208,6 +236,10 @@ class GUI:
                     or self.mode3_button.collidepoint(mouse_pos)
                 ):
                     self.handle_mode_buttons_click(mouse_pos)
+                elif self.generate_button.collidepoint(
+                    mouse_pos
+                ):  # Check generate button click
+                    self.handle_generate_button_click(mouse_pos)
                 else:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     self.selected_row = mouse_y // self.cell_size
@@ -274,6 +306,7 @@ class GUI:
             self.draw_grid()
             self.draw_number()
             self.draw_mode_buttons()
+            self.draw_generate_button()  # Draw generate button
             if self.board_unsolvable:
                 text = self.font.render("Board can't be solved", True, self.BLACK)
                 text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT + 80))
