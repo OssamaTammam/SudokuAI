@@ -12,11 +12,14 @@ class CSP:
 
     # Check if assigning a value to a variable is consistent with the current assignment
     def is_consistent(self, variable, value, assignment):
+        # Check consistency with respect to other variables
         for var_i, var_j in self.constraints:
-            if var_i == variable and (var_j, value) in assignment.items():
-                return False
-            if var_j == variable and (var_i, value) in assignment.items():
-                return False
+            if var_i == variable:
+                if var_j in assignment and assignment[var_j] == value:
+                    return False  # Inconsistent due to value constraint
+            elif var_j == variable:
+                if var_i in assignment and assignment[var_i] == value:
+                    return False  # Inconsistent due to value constraint
         return True
 
     # Perform arc consistency algorithm
