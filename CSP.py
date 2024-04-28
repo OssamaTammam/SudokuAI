@@ -38,14 +38,17 @@ class CSP:
     def revise(self, constraint):
         revised = False
         var_i, var_j = constraint
-        for value_i in list(self.domains[var_i]):  # Iterate over domain of var_i
+        original_domain_i = set(
+            self.domains[var_i]
+        )  # Store the original domain of var_i
+        for value_i in original_domain_i:  # Iterate over the original domain of var_i
             if all(
                 not self.is_consistent(var_i, value_i, {var_j: value_j})
                 for value_j in self.domains[var_j]
             ):
-                self.domains[var_i].remove(
-                    value_i
-                )  # Remove inconsistent value from domain
+                self.domains[var_i] = [
+                    value for value in self.domains[var_i] if value != value_i
+                ]  # Remove inconsistent value from domain
                 revised = True
         if revised:
             self.arc_trees[var_i][var_j] = list(
