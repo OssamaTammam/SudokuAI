@@ -61,13 +61,13 @@ class SudokuGenerator:
         for _ in range(num_remove):
             row, col = random.randint(0, 8), random.randint(0, 8)
             if solved_grid[row, col] != 0:  # Ensure the cell is not already empty
-                # original_value = solved_grid[row, col]
+                original_value = solved_grid[row, col]
                 solved_grid[row, col] = 0  # Remove the value
 
-            #     # Check if the puzzle is still solvable after removal
-            # if not self.is_puzzle_solvable(solved_grid):
-            #     # If not solvable, revert the change and try removing another cell
-            #     solved_grid[row, col] = original_value
+                # Check if the puzzle is still solvable after removal
+            if not self.is_puzzle_solvable(solved_grid):
+                # If not solvable, revert the change and try removing another cell
+                solved_grid[row, col] = original_value
 
         return solved_grid
 

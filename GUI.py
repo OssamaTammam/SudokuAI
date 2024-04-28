@@ -89,7 +89,6 @@ class GUI:
 
     def generate_new_puzzle(self):
         self.grid = self.generator.generate_puzzle()  # Generate new puzzle
-        print(self.grid)
 
     def draw_mode_buttons(self):
         # Mode 1 button

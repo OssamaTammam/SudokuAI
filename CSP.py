@@ -1,7 +1,6 @@
 from collections import defaultdict, deque
 
 
-# Define a class CSP (Constraint Satisfaction Problem)
 class CSP:
     # Initialize the CSP object with variables, domains, and constraints
     def __init__(self, variables, domains, constraints):
@@ -78,15 +77,25 @@ class CSP:
                 del assignment[var]  # Backtrack if no solution found
         return None  # No solution found
 
-    # Select unassigned variable
+    # MRV: Select unassigned variable with Minimum Remaining Values
     def select_unassigned_variable(self, assignment):
-        for var in self.variables:
-            if var not in assignment:
-                return var
+        unassigned_variables = [var for var in self.variables if var not in assignment]
+        return min(unassigned_variables, key=lambda var: len(self.domains[var]))
 
-    # Order domain values
+    # LCV: Order domain values using Least Constraining Value heuristic
     def order_domain_values(self, variable, assignment):
-        return self.domains[variable]
+        def count_conflicts(value):
+            conflicts = 0
+            for neighbor in self.get_neighbors(variable):
+                if neighbor not in assignment:
+                    for neighbor_value in self.domains[neighbor]:
+                        if not self.is_consistent(
+                            neighbor, neighbor_value, {variable: value}
+                        ):
+                            conflicts += 1
+            return conflicts
+
+        return sorted(self.domains[variable], key=count_conflicts)
 
     # Solve the CSP problem
     def solve(self):
